@@ -396,7 +396,6 @@ import EditorToolbar from 'corteza-webapp-reporter/src/components/EditorToolbar'
 import DisplayElementConfigurator from 'corteza-webapp-reporter/src/components/Report/Blocks/DisplayElements/Configurators'
 import ScenarioConfigurator from 'corteza-webapp-reporter/src/components/Report/Scenarios'
 import * as displayElementThumbnails from 'corteza-webapp-reporter/src/assets/DisplayElements'
-import VueSelect from 'vue-select'
 import Prefilter from 'corteza-webapp-reporter/src/components/Common/Prefilter'
 
 export default {
@@ -410,7 +409,6 @@ export default {
     DisplayElementConfigurator,
     ScenarioConfigurator,
     EditorToolbar,
-    VueSelect,
     Prefilter,
   },
 
