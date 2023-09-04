@@ -20,7 +20,7 @@
           :label="$t('steps:trigger.configurator.resource*')"
           label-class="text-primary"
         >
-          <vue-select
+          <c-input-select
             v-model="item.triggers.resourceType"
             :options="resourceTypeOptions"
             :get-option-key="getOptionTypeKey"
@@ -28,8 +28,6 @@
             :reduce="r => r.value"
             :filter="resTypeFilter"
             :placeholder="$t('steps:trigger.configurator.select-resource-type')"
-            :calculate-position="calculateDropdownPosition"
-            class="bg-white rounded"
             @input="resourceChanged"
           />
         </b-form-group>
@@ -39,7 +37,7 @@
           :label="$t('steps:trigger.configurator.event*')"
           label-class="text-primary"
         >
-          <vue-select
+          <c-input-select
             v-model="item.triggers.eventType"
             :options="eventTypeOptions"
             :get-option-key="getOptionEventTypeKey"
@@ -47,8 +45,6 @@
             :reduce="e => e.eventType"
             :filter="evtTypeFilter"
             :placeholder="$t('steps:trigger.configurator.select-event-type')"
-            :calculate-position="calculateDropdownPosition"
-            class="bg-white rounded"
             @input="eventChanged"
           />
         </b-form-group>
@@ -145,7 +141,7 @@
                 :label="$t('steps:trigger.configurator.resource')"
                 label-class="text-primary"
               >
-                <vue-select
+                <c-input-select
                   v-model="c.name"
                   :options="constraintNameTypes"
                   :get-option-key="getOptionTypeKey"
@@ -153,8 +149,6 @@
                   :reduce="c => c.value"
                   :filter="constrFilter"
                   :placeholder="$t('steps:trigger.configurator.select-constraint-type')"
-                  :calculate-position="calculateDropdownPosition"
-                  class="bg-white rounded"
                   @input="$root.$emit('change-detected')"
                 />
               </b-form-group>
@@ -163,15 +157,13 @@
                 :label="$t('steps:trigger.configurator.operator')"
                 label-class="text-primary"
               >
-                <vue-select
+                <c-input-select
                   v-model="c.op"
                   :options="constraintOperatorTypes"
                   :get-option-key="getOptionTypeKey"
                   label="text"
                   :reduce="c => c.value"
                   :placeholder="$t('steps:trigger.configurator.select-operator')"
-                  :calculate-position="calculateDropdownPosition"
-                  class="bg-white rounded"
                   @input="$root.$emit('change-detected')"
                 />
               </b-form-group>
@@ -293,7 +285,6 @@
 
 <script>
 import base from './base'
-import { VueSelect } from 'vue-select'
 import { components } from '@cortezaproject/corteza-vue'
 import { objectSearchMaker } from '../../lib/filter'
 const { CInputDateTime } = components
@@ -301,7 +292,6 @@ const { CInputDateTime } = components
 export default {
   components: {
     CInputDateTime,
-    VueSelect,
   },
 
   extends: base,
