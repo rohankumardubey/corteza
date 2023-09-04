@@ -140,13 +140,7 @@
 </template>
 
 <script>
-import { VueSelect } from 'vue-select'
-
 export default {
-  components: {
-    VueSelect,
-  },
-
   props: {
     filter: {
       type: Object,
