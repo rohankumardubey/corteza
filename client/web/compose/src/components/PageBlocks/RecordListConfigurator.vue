@@ -262,6 +262,7 @@
                   v-model="options.prefilter"
                   :placeholder="$t('recordList.record.prefilterPlaceholder')"
                 />
+
                 <b-form-text>
                   <i18next
                     path="recordList.record.prefilterFootnote"

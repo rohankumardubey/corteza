@@ -5,7 +5,7 @@
         v-if="!hideNamespaceList"
         class="d-flex w-100 mt-2"
       >
-        <vue-select
+        <c-input-select
           key="namespaceID"
           data-test-id="select-namespace"
           label="name"
@@ -15,7 +15,6 @@
           :value="namespace"
           :selectable="option => option.namespaceID !== namespace.namespaceID"
           :placeholder="$t('pickNamespace')"
-          :calculate-position="calculateDropdownPosition"
           :autoscroll="false"
           class="bg-white rounded"
           @option:selected="namespaceSelected"
@@ -34,7 +33,7 @@
               </router-link>
             </li>
           </template>
-        </vue-select>
+        </c-input-select>
 
         <b-input-group-append v-if="canManageNamespaces">
           <b-button
@@ -119,8 +118,6 @@ import { mapGetters } from 'vuex'
 import { NoID } from '@cortezaproject/corteza-js'
 import { components, filter } from '@cortezaproject/corteza-vue'
 import { Portal } from 'portal-vue'
-import { VueSelect } from 'vue-select'
-
 const { CSidebarNavItems, CInputSearch } = components
 
 const moduleWrap = (module, pageName) => {
@@ -164,7 +161,6 @@ export default {
 
   components: {
     Portal,
-    VueSelect,
     CSidebarNavItems,
     CInputSearch,
   },

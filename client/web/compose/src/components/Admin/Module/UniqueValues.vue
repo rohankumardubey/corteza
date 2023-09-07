@@ -141,16 +141,11 @@
 
 <script>
 import { compose } from '@cortezaproject/corteza-js'
-import { VueSelect } from 'vue-select'
 
 export default {
   i18nOptions: {
     namespaces: 'module',
     keyPrefix: 'edit.config.uniqueValues',
-  },
-
-  components: {
-    VueSelect,
   },
 
   props: {

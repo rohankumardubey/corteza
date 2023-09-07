@@ -51,7 +51,7 @@
       </b-card>
 
       <template #modal-footer>
-        <vue-select
+        <c-input-select
           v-model="selectedField"
           :placeholder="getFieldSelectorPlaceholder"
           :get-option-label="getFieldLabel"
@@ -103,7 +103,6 @@
 
 <script>
 import FieldEditor from 'corteza-webapp-compose/src/components/ModuleFields/Editor'
-import { VueSelect } from 'vue-select'
 import { compose } from '@cortezaproject/corteza-js'
 import record from 'corteza-webapp-compose/src/mixins/record.js'
 
@@ -115,7 +114,6 @@ export default {
   name: 'BulkEdit',
 
   components: {
-    VueSelect,
     FieldEditor,
   },
 

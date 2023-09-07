@@ -165,7 +165,7 @@
             style="width: 50%; min-width: 200px;"
           >
             <b-input-group class="d-flex flex-nowrap w-100">
-              <vue-select
+              <c-input-select
                 v-model="tab.blockID"
                 :options="blockOptions"
                 :placeholder="$t('tabs.placeholder.block')"
@@ -173,7 +173,6 @@
                 :get-option-key="getOptionKey"
                 :selectable="option => isSelectable(option)"
                 :reduce="option => option.value"
-                :calculate-position="calculateDropdownPosition"
                 append-to-body
                 class="bg-white rounded"
               />
@@ -261,7 +260,6 @@
 <script>
 import base from './base'
 import draggable from 'vuedraggable'
-import { VueSelect } from 'vue-select'
 import { fetchID } from 'corteza-webapp-compose/src/lib/block'
 
 export default {
@@ -273,7 +271,6 @@ export default {
 
   components: {
     draggable,
-    VueSelect,
     //  Importing like this because configurator is recursive
     NewBlockSelector: () => import('corteza-webapp-compose/src/components/Admin/Page/Builder/Selector'),
   },

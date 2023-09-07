@@ -537,7 +537,7 @@
         :label="$t('page-layout.roles.label')"
         label-class="text-primary"
       >
-        <vue-select
+        <c-input-select
           v-model="currentLayoutRoles"
           :options="roles.options"
           :loading="roles.processing"
@@ -952,7 +952,6 @@ import Uploader from 'corteza-webapp-compose/src/components/Public/Page/Attachme
 import Draggable from 'vuedraggable'
 import { compose, NoID } from '@cortezaproject/corteza-js'
 import { handle } from '@cortezaproject/corteza-vue'
-import { VueSelect } from 'vue-select'
 
 export default {
   i18nOptions: {
@@ -967,7 +966,6 @@ export default {
     PageLayoutTranslator,
     Uploader,
     Draggable,
-    VueSelect,
   },
 
   mixins: [

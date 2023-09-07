@@ -40,7 +40,7 @@
       :removable="field.options.selectType !== 'multiple'"
     >
       <template v-slot:single>
-        <vue-select
+        <c-input-select
           v-if="field.options.selectType === 'multiple'"
           v-model="multipleSelected"
           :options="options"
@@ -50,12 +50,10 @@
           option-value="recordID"
           option-text="label"
           :append-to-body="appendToBody"
-          :calculate-position="calculateDropdownPosition"
           :clearable="false"
           :filterable="false"
           :searchable="searchable"
           :selectable="option => option.selectable"
-          class="bg-white w-100 rounded"
           :placeholder="placeholder"
           multiple
           @search="search"
@@ -68,8 +66,9 @@
             @prev="goToPage(false)"
             @next="goToPage(true)"
           />
-        </vue-select>
-        <vue-select
+        </c-input-select>
+
+        <c-input-select
           v-else
           ref="singleSelect"
           :options="options"
@@ -79,12 +78,10 @@
           option-value="recordID"
           option-text="label"
           :append-to-body="appendToBody"
-          :calculate-position="calculateDropdownPosition"
           :clearable="false"
           :filterable="false"
           :searchable="searchable"
           :selectable="option => option.selectable"
-          class="bg-white w-100 rounded"
           :placeholder="placeholder"
           @input="selectChange($event)"
           @search="search"
@@ -97,10 +94,11 @@
             @prev="goToPage(false)"
             @next="goToPage(true)"
           />
-        </vue-select>
+        </c-input-select>
       </template>
+
       <template v-slot:default="ctx">
-        <vue-select
+        <c-input-select
           v-if="field.options.selectType === 'each'"
           :options="options"
           :get-option-key="getOptionKey"
@@ -109,12 +107,10 @@
           option-value="recordID"
           option-text="label"
           :append-to-body="appendToBody"
-          :calculate-position="calculateDropdownPosition"
           :clearable="false"
           :filterable="false"
           :searchable="searchable"
           :selectable="option => option.selectable"
-          class="bg-white w-100 rounded"
           :placeholder="placeholder"
           :value="getRecord(ctx.index)"
           @input="setRecord($event, ctx.index)"
@@ -128,7 +124,8 @@
             @prev="goToPage(false)"
             @next="goToPage(true)"
           />
-        </vue-select>
+        </c-input-select>
+
         <b-spinner
           v-else-if="processing"
           variant="primary"
@@ -139,10 +136,11 @@
         </span>
       </template>
     </multi>
+
     <template
       v-else
     >
-      <vue-select
+      <c-input-select
         v-model="selected"
         :options="options"
         :get-option-key="getOptionKey"
@@ -151,12 +149,10 @@
         option-value="recordID"
         option-text="label"
         :append-to-body="appendToBody"
-        :calculate-position="calculateDropdownPosition"
         :placeholder="placeholder"
         :filterable="false"
         :searchable="searchable"
         :selectable="option => option.selectable"
-        class="bg-white w-100 rounded"
         @search="search"
       >
         <pagination
@@ -167,7 +163,8 @@
           @prev="goToPage(false)"
           @next="goToPage(true)"
         />
-      </vue-select>
+      </c-input-select>
+
       <errors :errors="errors" />
     </template>
   </b-form-group>
@@ -177,7 +174,6 @@ import base from './base'
 import { debounce } from 'lodash'
 import { compose, NoID } from '@cortezaproject/corteza-js'
 import { mapActions, mapGetters } from 'vuex'
-import { VueSelect } from 'vue-select'
 import { evaluatePrefilter } from 'corteza-webapp-compose/src/lib/record-filter'
 import Pagination from '../Common/Pagination.vue'
 
@@ -187,7 +183,6 @@ export default {
   },
 
   components: {
-    VueSelect,
     Pagination,
   },
 
@@ -374,6 +369,36 @@ export default {
         this.fetchPrefiltered({ namespaceID, moduleID, query, sort: this.sortString(), limit, pageCursor })
       }
     }, 300),
+
+    searchfn (query = '') {
+      query = this.query
+      if (query !== this.query) {
+        this.query = query
+        this.filter.pageCursor = undefined
+      }
+
+      const { limit, pageCursor } = this.filter
+      const namespaceID = this.namespace.namespaceID
+      const moduleID = this.field.options.moduleID
+
+      if (moduleID && moduleID !== NoID) {
+        // Determine what fields to use for searching
+        // Default to label field
+        let qf = this.field.options.queryFields
+        if (!qf || qf.length === 0) {
+          qf = [this.field.options.labelField]
+        }
+
+        if (query.length > 0) {
+          // Construct query
+          query = qf.map(qf => {
+            return `${qf} LIKE '%${query}%'`
+          }).join(' OR ')
+        }
+
+        this.fetchPrefiltered({ namespaceID, moduleID, query, sort: this.sortString(), limit, pageCursor })
+      }
+    },
 
     loadLatest () {
       const namespaceID = this.namespace.namespaceID

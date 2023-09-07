@@ -443,7 +443,6 @@ import draggable from 'vuedraggable'
 import ReportItem from 'corteza-webapp-compose/src/components/Chart/ReportItem'
 import Reports from 'corteza-webapp-compose/src/components/Chart/Report'
 import { chartConstructor } from 'corteza-webapp-compose/src/lib/charts'
-import VueSelect from 'vue-select'
 import { evaluatePrefilter } from 'corteza-webapp-compose/src/lib/record-filter'
 
 const { CInputConfirm, CInputCheckbox, CInputColorPicker } = components
@@ -466,7 +465,6 @@ export default {
     ChartComponent,
     draggable,
     ReportItem,
-    VueSelect,
     CInputCheckbox,
     CInputColorPicker,
     CInputConfirm,

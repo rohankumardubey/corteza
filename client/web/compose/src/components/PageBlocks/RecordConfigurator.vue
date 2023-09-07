@@ -49,7 +49,7 @@
             :description="$t('record.referenceRecordFieldDescription')"
             label-class="text-primary"
           >
-            <vue-select
+            <c-input-select
               v-model="options.referenceField"
               :options="recordSelectorFields"
               :get-option-label="getFieldLabel"
@@ -58,7 +58,6 @@
               :reduce="getOptionKey"
               :calculate-position="calculateDropdownPosition"
               append-to-body
-              class="bg-white rounded"
               @input="updateReferenceModule($event, [])"
             />
           </b-form-group>
@@ -73,7 +72,7 @@
             label-class="text-primary"
           >
             <c-input-checkbox
-              v-model="options.inlineRecordEditEnabled"
+              v-model="inlineRecordEditEnabled"
               switch
               :labels="checkboxLabel"
             />
@@ -174,7 +173,7 @@
               class="align-middle"
               style="width: 33%; min-width: 250px;"
             >
-              <vue-select
+              <c-input-select
                 v-model="condition.field"
                 :options="block.options.fields"
                 append-to-body
@@ -235,7 +234,6 @@
 <script>
 import base from './base'
 import FieldPicker from 'corteza-webapp-compose/src/components/Common/FieldPicker'
-import { VueSelect } from 'vue-select'
 import { mapActions } from 'vuex'
 import { NoID, compose } from '@cortezaproject/corteza-js'
 
@@ -248,7 +246,6 @@ export default {
 
   components: {
     FieldPicker,
-    VueSelect,
   },
 
   extends: base,
@@ -288,6 +285,15 @@ export default {
 
     fieldModule () {
       return (this.options.referenceField && this.referenceModule) ? this.referenceModule : this.module
+    },
+
+    inlineRecordEditEnabled: {
+      get () {
+        return !!this.options.inlineRecordEditEnabled
+      },
+      set (v) {
+        this.options.inlineRecordEditEnabled = v
+      },
     },
   },
 

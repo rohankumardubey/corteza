@@ -62,6 +62,7 @@ Vue.component('c-resource-list', components.CResourceList)
 Vue.component('c-input-checkbox', components.CInputCheckbox)
 Vue.component('c-button-submit', components.CButtonSubmit)
 Vue.component('c-hint', components.CHint)
+Vue.component('c-input-select', components.CInputSelect)
 
 // Map things
 Vue.component('l-map', LMap)

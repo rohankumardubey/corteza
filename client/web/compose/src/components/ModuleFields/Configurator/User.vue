@@ -11,7 +11,7 @@
       :label="$t('kind.user.roles.label')"
       label-class="text-primary"
     >
-      <vue-select
+      <c-input-select
         v-model="f.options.roles"
         :options="roleOptions"
         :get-option-key="getOptionKey"
@@ -21,10 +21,8 @@
         :close-on-select="false"
         append-to-body
         :placeholder="$t('kind.user.roles.placeholder')"
-        :calculate-position="calculateDropdownPosition"
         multiple
         label="name"
-        class="bg-white rounded"
       />
     </b-form-group>
 
@@ -58,15 +56,10 @@
 
 <script>
 import base from './base'
-import { VueSelect } from 'vue-select'
 
 export default {
   i18nOptions: {
     namespaces: 'field',
-  },
-
-  components: {
-    VueSelect,
   },
 
   extends: base,
