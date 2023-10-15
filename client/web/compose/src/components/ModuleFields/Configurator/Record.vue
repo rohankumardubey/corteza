@@ -4,11 +4,12 @@
       :label="$t('kind.record.moduleLabel')"
       label-class="text-primary"
     >
-      <b-form-select
+      <c-input-select
         v-model="f.options.moduleID"
         :options="moduleOptions"
-        text-field="name"
-        value-field="moduleID"
+        label="name"
+        :reduce="module => module.moduleID"
+        append-to-body
       />
     </b-form-group>
 
@@ -27,6 +28,9 @@
         <b-form-select
           v-model="f.options.labelField"
           :options="fieldOptions"
+          label="text"
+          :reduce="field => field.value"
+          append-to-body
         />
       </b-form-group>
 

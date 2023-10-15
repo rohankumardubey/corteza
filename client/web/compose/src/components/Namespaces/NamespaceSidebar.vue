@@ -6,13 +6,12 @@
         class="d-flex w-100 mt-2"
       >
         <c-input-select
-          key="namespaceID"
           data-test-id="select-namespace"
-          label="name"
           :clearable="false"
           :options="filteredNamespaces"
           :get-option-key="getOptionKey"
-          :value="namespace"
+          :get-option-label="getOptionLabel"
+          :value="namespace.name.namespaceID"
           :selectable="option => option.namespaceID !== namespace.namespaceID"
           :placeholder="$t('pickNamespace')"
           :autoscroll="false"
@@ -67,6 +66,7 @@
           >
             {{ $t('publicPages') }}
           </b-button>
+
           <b-button
             v-else-if="namespace.canManageNamespace"
             data-test-id="button-admin"
@@ -76,6 +76,7 @@
           >
             {{ $t('adminPanel') }}
           </b-button>
+
           <c-input-search
             v-model.trim="query"
             :disabled="loading"
@@ -451,8 +452,18 @@ export default {
       })
     },
 
-    getOptionKey ({ namespaceID }) {
-      return namespaceID
+    getOptionKey (value) {
+      if (typeof value === 'string') {
+        return this.filteredNamespaces.find(({ namespaceID }) => namespaceID === value).namespaceID
+      }
+      return value.namespaceID
+    },
+
+    getOptionLabel (value) {
+      if (typeof value === 'string') {
+        return this.filteredNamespaces.find(({ namespaceID }) => namespaceID === value).name
+      }
+      return value.name
     },
   },
 }

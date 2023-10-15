@@ -309,8 +309,7 @@
                 :options="maxValueModuleFields"
                 :get-option-key="getOptionModuleFieldKey"
                 :reduce="f => f.name"
-                :calculate-position="calculateDropdownPosition"
-                class="bg-white rounded"
+                class="bg-white"
                 @input="fieldChanged($event, options.maxValue)"
               />
             </b-form-group>
@@ -332,8 +331,7 @@
                 :options="aggregationOperations"
                 :get-option-key="getOptionAggregationOperationKey"
                 :reduce="a => a.operation"
-                :calculate-position="calculateDropdownPosition"
-                class="bg-white rounded"
+                class="bg-white"
               />
             </b-form-group>
           </b-col>
@@ -359,9 +357,11 @@
             :label="$t('progress.default-variant')"
             label-class="text-primary"
           >
-            <b-form-select
+            <c-input-select
               v-model="options.display.variant"
               :options="variants"
+              label="text"
+              :reduce="v => v.value"
             />
           </b-form-group>
         </b-col>
@@ -435,6 +435,7 @@
                 {{ $t('progress.threshold.variant') }}
               </small>
             </template>
+
             <b-row
               v-for="(t, i) in options.display.thresholds"
               :key="i"
@@ -453,6 +454,7 @@
                   />
                 </b-input-group>
               </b-col>
+
               <b-col
                 class="d-flex align-items-center justify-content-center"
               >

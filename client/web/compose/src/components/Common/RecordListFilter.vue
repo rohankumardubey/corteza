@@ -58,12 +58,14 @@
                     >
                       {{ $t('recordList.filter.where') }}
                     </h6>
+
                     <b-form-select
                       v-else
                       v-model="filter.condition"
                       :options="conditions"
                     />
                   </b-td>
+
                   <b-td
                     class="px-2"
                   >
@@ -81,6 +83,7 @@
                       @input="onChange($event, groupIndex, index)"
                     />
                   </b-td>
+
                   <b-td
                     v-if="getField(filter.name)"
                     :class="{ 'pr-2': getField(filter.name) }"

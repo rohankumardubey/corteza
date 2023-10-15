@@ -48,21 +48,15 @@
         :single-input="field.options.selectType !== 'each'"
       >
         <template v-slot:single>
-          <b-form-select
+          <c-input-select
             v-if="field.options.selectType === 'default'"
             ref="singleSelect"
             :options="selectOptions"
-            @change="selectChange"
-          >
-            <template slot="first">
-              <option
-                :value="undefined"
-                disabled
-              >
-                {{ $t('kind.select.placeholder') }}
-              </option>
-            </template>
-          </b-form-select>
+            :placeholder="$t('kind.select.placeholder')"
+            :reduce="o => o.value"
+            label="text"
+            @input="selectChange"
+          />
 
           <b-form-select
             v-if="field.options.selectType === 'multiple'"
@@ -74,20 +68,14 @@
         </template>
 
         <template v-slot:default="ctx">
-          <b-form-select
+          <c-input-select
             v-if="field.options.selectType === 'each'"
             v-model="value[ctx.index]"
             :options="selectOptions"
-          >
-            <template slot="first">
-              <option
-                :value="undefined"
-                disabled
-              >
-                {{ $t('kind.select.placeholder') }}
-              </option>
-            </template>
-          </b-form-select>
+            :reduce="o => o.value"
+            :placeholder="$t('kind.select.placeholder')"
+            label="text"
+          />
 
           <span v-else>{{ findLabel(value[ctx.index]) }}</span>
         </template>
@@ -97,17 +85,15 @@
     <template
       v-else
     >
-      <b-form-select
+      <c-input-select
         v-if="field.options.selectType === 'default'"
         v-model="value"
         :options="selectOptions"
-      >
-        <template slot="first">
-          <option :value="undefined">
-            {{ $t('kind.select.optionNotSelected') }}
-          </option>
-        </template>
-      </b-form-select>
+        :reduce="o => o.value"
+        label="text"
+        :placeholder="$t('kind.select.optionNotSelected')"
+        append-to-body
+      />
 
       <b-form-radio-group
         v-else

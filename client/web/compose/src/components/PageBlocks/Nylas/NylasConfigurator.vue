@@ -71,8 +71,7 @@
                   :get-option-label="getFieldLabel"
                   :get-option-key="getOptionKey"
                   :placeholder="$t('prefill.selectField')"
-                  :reduce="getOptionKey"
-                  :calculate-position="calculateDropdownPosition"
+                  :reduce="field => field.fieldID"
                   append-to-body
                   class="bg-white rounded"
                 />

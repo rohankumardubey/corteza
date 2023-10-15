@@ -56,7 +56,6 @@
               :get-option-key="getOptionKey"
               :placeholder="$t('record.referenceRecordFieldPlaceholder')"
               :reduce="getOptionKey"
-              :calculate-position="calculateDropdownPosition"
               append-to-body
               @input="updateReferenceModule($event, [])"
             />
@@ -182,8 +181,7 @@
                 :get-option-label="getOptionLabel"
                 :get-option-key="getOptionKey"
                 :reduce="option => option.isSystem ? option.name : option.fieldID"
-                :calculate-position="calculateDropdownPosition"
-                class="bg-white rounded"
+                class="bg-white"
               />
             </b-td>
 
