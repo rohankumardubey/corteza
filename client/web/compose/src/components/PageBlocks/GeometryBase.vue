@@ -17,50 +17,31 @@
       @mouseover="disableMap"
       @mouseleave="enableMap"
     >
-      <l-map
-        v-if="map"
-        ref="map"
-        :zoom="map.zoom"
-        :center="map.center"
-        :min-zoom="map.zoomMin"
-        :max-zoom="map.zoomMax"
-        :bounds="map.bounds"
-        :max-bounds="map.bounds"
+      <c-map
+        ref="c-map"
+        :map="{
+          ...map,
+          maxBounds: map.bounds
+        }"
+        :label="{
+          tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
+        }"
+        :polygon-geometries="geometries"
+        :polygon-colors="colors"
         class="w-100 h-100"
-        @locationfound="onLocationFound"
+        @on-location-found="onLocationFound"
+        @on-map-ref="onMapRefEmit"
       >
-        <l-tile-layer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          :attribution="map.attribution"
-        />
-        <l-polygon
-          v-for="(geometry, i) in geometries"
-          :key="`polygon-${i}`"
-          :lat-lngs="geometry.map(value => value.geometry)"
-          :color="colors[i]"
-        />
-
-        <l-marker
-          v-for="(marker, i) in localValue"
-          :key="`marker-${i}`"
-          :lat-lng="marker.value"
-          :icon="getIcon(marker)"
-          @click="onMarkerCLick(marker.recordID, marker.moduleID)"
-        />
-        <l-control class="leaflet-bar">
-          <a
-            :title="$t('geometry.tooltip.goToCurrentLocation')"
-            role="button"
-            class="d-flex justify-content-center align-items-center"
-            @click="goToCurrentLocation"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'location-arrow']"
-              class="text-primary"
-            />
-          </a>
-        </l-control>
-      </l-map>
+        <template #markers>
+          <l-marker
+            v-for="(marker, i) in localValue"
+            :key="`marker-${i}`"
+            :lat-lng="marker.value"
+            :icon="getIcon(marker)"
+            @click="onMarkerCLick(marker.recordID, marker.moduleID)"
+          />
+        </template>
+      </c-map>
     </div>
   </wrap>
 </template>
@@ -68,13 +49,15 @@
 <script>
 import axios from 'axios'
 import { divIcon, latLng, latLngBounds } from 'leaflet'
-import { LPolygon, LControl } from 'vue2-leaflet'
 import { compose, NoID } from '@cortezaproject/corteza-js'
+import { components } from '@cortezaproject/corteza-vue'
 import { mapGetters, mapActions } from 'vuex'
 import { evaluatePrefilter } from 'corteza-webapp-compose/src/lib/record-filter'
 import { isNumber } from 'lodash'
 
 import base from './base'
+
+const { CMap } = components
 
 export default {
   i18nOptions: {
@@ -82,8 +65,7 @@ export default {
   },
 
   components: {
-    LPolygon,
-    LControl,
+    CMap,
   },
 
   extends: base,
@@ -100,6 +82,7 @@ export default {
       markers: [],
 
       cancelTokenSource: axios.CancelToken.source(),
+      mapRef: undefined,
     }
   },
 
@@ -249,8 +232,8 @@ export default {
         this.processing = false
 
         setTimeout(() => {
-          if (!this.$refs.map) return
-          this.$refs.map.mapObject.invalidateSize()
+          if (!this.mapRef) return
+          this.mapRef.mapObject.invalidateSize()
         })
       })
     },
@@ -285,20 +268,20 @@ export default {
     },
 
     disableMap () {
-      if (this.editable) this.$refs.map.mapObject._handlers.forEach(handler => handler.disable())
+      if (this.editable) this.mapRef.mapObject._handlers.forEach(handler => handler.disable())
     },
 
     enableMap () {
-      if (this.editable) this.$refs.map.mapObject._handlers.forEach(handler => handler.enable())
+      if (this.editable) this.mapRef.mapObject._handlers.forEach(handler => handler.enable())
     },
 
     goToCurrentLocation () {
-      this.$refs.map.mapObject.locate()
+      this.mapRef.mapObject.locate()
     },
 
     onLocationFound ({ latitude, longitude }) {
-      const zoom = this.$refs.map.mapObject._zoom >= 13 ? this.$refs.map.mapObject._zoom : 13
-      this.$refs.map.mapObject.flyTo([latitude, longitude], zoom)
+      const zoom = this.mapRef.mapObject._zoom >= 13 ? this.mapRef.mapObject._zoom : 13
+      this.mapRef.mapObject.flyTo([latitude, longitude], zoom)
     },
 
     onMarkerCLick (recordID, moduleID) {
@@ -345,6 +328,10 @@ export default {
 
     destroyEvents () {
       this.$root.$off('module-records-updated', this.refreshOnRelatedRecordsUpdate)
+    },
+
+    onMapRefEmit (map) {
+      this.mapRef = map
     },
   },
 }

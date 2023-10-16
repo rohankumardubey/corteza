@@ -19,41 +19,31 @@
       label-class="text-primary"
       class="mb-0"
     >
-      <l-map
-        ref="map"
-        :zoom="zoom"
-        :center="center"
-        class="w-100"
-        style="height: 50vh;"
-        @update:zoom="f.options.zoom = $event"
-        @update:center="f.options.center = $event"
-        @locationfound="onLocationFound"
-      >
-        <l-tile-layer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          :attribution="attribution"
-        />
-        <l-control class="leaflet-bar">
-          <a
-            :title="$t('tooltip.goToCurrentLocation')"
-            role="button"
-            class="d-flex justify-content-center align-items-center"
-            @click="goToCurrentLocation"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'location-arrow']"
-              class="text-primary"
-            />
-          </a>
-        </l-control>
-      </l-map>
+      <c-map
+        ref="c-map"
+        :field="field"
+        :map="{
+          zoom,
+          center,
+          attribution
+        }"
+        :label="{
+          tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
+        }"
+        :on-location-found="onLocationFound"
+        :on-go-to-current-location="goToCurrentLocation"
+        @on-map-ref="onMapRefEmit"
+        @on-zoom="f.options.zoom = $event"
+        @on-center="f.options.center = $event"
+      />
     </b-form-group>
   </div>
 </template>
 
 <script>
 import base from './base'
-import { LControl } from 'vue2-leaflet'
+import { components } from '@cortezaproject/corteza-vue'
+const { CMap } = components
 
 export default {
   i18nOptions: {
@@ -62,7 +52,7 @@ export default {
   },
 
   components: {
-    LControl,
+    CMap,
   },
 
   extends: base,
@@ -70,6 +60,7 @@ export default {
   data () {
     return {
       attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a>',
+      mapRef: undefined,
     }
   },
 
@@ -86,6 +77,10 @@ export default {
   methods: {
     goToCurrentLocation () {
       this.$refs.map.mapObject.locate()
+    },
+
+    onMapRefEmit (map) {
+      this.mapRef = map
     },
 
     onLocationFound ({ latitude, longitude }) {

@@ -1,39 +1,26 @@
 <template>
   <div>
     <div class="my-2">
-      <l-map
-        ref="map"
-        :zoom="options.zoomStarting"
-        :min-zoom="options.zoomMin"
-        :max-zoom="options.zoomMax"
-        :center="options.center"
-        :bounds="bounds"
-        :max-bounds="options.bounds"
-        class="w-100 cursor-pointer"
+      <c-map
+        ref="c-map"
+        :map="{
+          zoom: options.zoomStarting,
+          minZoom: options.zoomMin,
+          maxZoom: options.zoomMax,
+          center: options.center,
+          bounds,
+          maxBounds: options.bounds,
+          attribution: map.attribution
+        }"
+        :label="{
+          tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
+        }"
         style="height: 45vh;"
-        @update:zoom="zoomUpdated"
-        @update:center="updateCenter"
-        @update:bounds="boundsUpdated"
-        @locationfound="onLocationFound"
-      >
-        <l-tile-layer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          :attribution="map.attribution"
-        />
-        <l-control class="leaflet-bar">
-          <a
-            :title="$t('geometry.tooltip.goToCurrentLocation')"
-            role="button"
-            class="d-flex justify-content-center align-items-center"
-            @click="goToCurrentLocation"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'location-arrow']"
-              class="text-primary"
-            />
-          </a>
-        </l-control>
-      </l-map>
+        @on-go-to-current-location="goToCurrentLocation"
+        @on-map-ref="onMapRefEmit"
+        @on-bounds-update="boundsUpdated"
+      />
+
       <b-form-text id="password-help-block">
         {{ $t('geometry.mapHelpText') }}
       </b-form-text>
@@ -139,7 +126,8 @@
 
 <script>
 import base from '../base'
-import { LControl } from 'vue2-leaflet'
+import { components } from '@cortezaproject/corteza-vue'
+const { CMap } = components
 
 export default {
   i18nOptions: {
@@ -147,7 +135,7 @@ export default {
   },
 
   components: {
-    LControl,
+    CMap,
   },
 
   extends: base,
@@ -165,6 +153,7 @@ export default {
       localValue: { coordinates: [] },
       center: [],
       bounds: null,
+      mapRef: undefined,
     }
   },
 
@@ -204,7 +193,7 @@ export default {
 
     updateBounds (value) {
       if (value) {
-        const bounds = this.bounds || this.$refs.map.mapObject.getBounds()
+        const bounds = this.bounds || this.mapRef.mapObject.getBounds()
         const { _northEast, _southWest } = bounds
 
         this.options.bounds = [Object.values(_northEast), Object.values(_southWest)]
@@ -214,12 +203,12 @@ export default {
     },
 
     goToCurrentLocation () {
-      this.$refs.map.mapObject.locate()
+      this.mapRef.mapObject.locate()
     },
 
     onLocationFound ({ latitude, longitude }) {
-      const zoom = this.$refs.map.mapObject._zoom >= 13 ? this.$refs.map.mapObject._zoom : 13
-      this.$refs.map.mapObject.flyTo([latitude, longitude], zoom)
+      const zoom = this.mapRef.mapObject._zoom >= 13 ? this.mapRef.mapObject._zoom : 13
+      this.mapRef.mapObject.flyTo([latitude, longitude], zoom)
     },
 
     setDefaultValues () {
@@ -227,6 +216,10 @@ export default {
       this.localValue = {}
       this.center = []
       this.bounds = null
+    },
+
+    onMapRefEmit (map) {
+      this.mapRef = map
     },
   },
 }

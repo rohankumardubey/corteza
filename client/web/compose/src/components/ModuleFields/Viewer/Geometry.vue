@@ -48,38 +48,20 @@
         </div>
       </div>
 
-      <l-map
-        ref="map"
-        :zoom="map.zoom"
-        :center="map.center"
-        style="height: 75vh; width: 100%;"
-        @locationfound="onLocationFound"
-      >
-        <l-tile-layer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          :attribution="map.attribution"
-        />
-        <l-marker
-          v-for="(marker, i) in localValue"
-          :key="i"
-          :lat-lng="marker"
-          :opacity="localValueIndex === undefined || i == localValueIndex ? 1.0 : 0.6"
-        />
-        <l-control class="leaflet-bar">
-          <a
-            v-if="!field.options.hideCurrentLocationButton"
-            :title="$t('tooltip.goToCurrentLocation')"
-            role="button"
-            class="d-flex justify-content-center align-items-center"
-            @click="goToCurrentLocation"
-          >
-            <font-awesome-icon
-              :icon="['fas', 'location-arrow']"
-              class="text-primary"
-            />
-          </a>
-        </l-control>
-      </l-map>
+      <c-map
+        ref="c-map"
+        :field="field"
+        :map="map"
+        :local-value-index="localValueIndex"
+        :markers="localValue"
+        :hide-current-location-button="!field.options.hideCurrentLocationButton"
+        :label="{
+          tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
+        }"
+        @on-location-found="onLocationFound"
+        @on-go-to-current-location="goToCurrentLocation"
+        @on-map-ref="onMapRefEmit"
+      />
     </b-modal>
 
     <errors :errors="errors" />
@@ -88,11 +70,10 @@
 <script>
 import base from './base'
 import { latLng } from 'leaflet'
-import { LControl } from 'vue2-leaflet'
 import { OpenStreetMapProvider } from 'leaflet-geosearch'
 import { components } from '@cortezaproject/corteza-vue'
 import { isNumber } from 'lodash'
-const { CInputSearch } = components
+const { CInputSearch, CMap } = components
 
 export default {
   i18nOptions: {
@@ -101,8 +82,8 @@ export default {
   },
 
   components: {
-    LControl,
     CInputSearch,
+    CMap,
   },
 
   extends: base,
@@ -123,6 +104,8 @@ export default {
         provider: new OpenStreetMapProvider(),
         results: [],
       },
+
+      mapRef: undefined,
     }
   },
 
@@ -143,6 +126,10 @@ export default {
   },
 
   methods: {
+    onMapRefEmit (map) {
+      this.mapRef = map
+    },
+
     openMap (index) {
       this.localValueIndex = index
       this.map.center = this.localValue[index] || this.field.options.center
@@ -150,7 +137,7 @@ export default {
       this.map.show = true
 
       setTimeout(() => {
-        this.$refs.map.mapObject.invalidateSize()
+        this.mapRef.mapObject.invalidateSize()
       }, 100)
     },
 
@@ -163,17 +150,17 @@ export default {
     },
 
     goToCurrentLocation () {
-      this.$refs.map.mapObject.locate()
+      this.mapRef.mapObject.locate()
     },
 
     onLocationFound ({ latitude, longitude }) {
-      const zoom = this.$refs.map.mapObject._zoom >= 13 ? this.$refs.map.mapObject._zoom : 13
-      this.$refs.map.mapObject.flyTo([latitude, longitude], zoom)
+      const zoom = this.mapRef.mapObject._zoom >= 13 ? this.mapRef.mapObject._zoom : 13
+      this.mapRef.mapObject.flyTo([latitude, longitude], zoom)
     },
 
     placeGeoSearchMarker (result) {
-      const zoom = this.$refs.map.mapObject._zoom >= 15 ? this.$refs.map.mapObject._zoom : 15
-      this.$refs.map.mapObject.flyTo([result.latlng.lat, result.latlng.lng], zoom, { animate: false })
+      const zoom = this.mapRef.mapObject._zoom >= 15 ? this.mapRef.mapObject._zoom : 15
+      this.mapRef.mapObject.flyTo([result.latlng.lat, result.latlng.lng], zoom, { animate: false })
       this.geoSearch.results = []
     },
 
