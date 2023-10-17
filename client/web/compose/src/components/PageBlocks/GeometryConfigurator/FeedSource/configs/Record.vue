@@ -9,18 +9,12 @@
         label-class="text-primary"
       >
         <b-input-group>
-          <b-form-select
+          <c-input-select
             v-model="feed.options.moduleID"
-            :options="modules"
-            value-field="moduleID"
-            text-field="name"
-          >
-            <template slot="first">
-              <option value="0">
-                {{ $t('geometry.recordFeed.modulePlaceholder') }}
-              </option>
-            </template>
-          </b-form-select>
+            :options="moduleOptions"
+            :reduce="o => o.moduleID"
+            label="name"
+          />
         </b-input-group>
       </b-form-group>
 
@@ -54,19 +48,13 @@
           breakpoint="md"
           label-class="text-primary"
         >
-          <b-form-select
+          <c-input-select
             v-model="feed.titleField"
             :options="titleFields | optionizeFields"
-          >
-            <template slot="first">
-              <option
-                disabled
-                value=""
-              >
-                {{ $t('geometry.recordFeed.titlePlaceholder') }}
-              </option>
-            </template>
-          </b-form-select>
+            :reduce="o => o.value"
+            label="text"
+            :placeholder="$t('geometry.recordFeed.titlePlaceholder')"
+          />
         </b-form-group>
 
         <b-form-group
@@ -161,6 +149,13 @@ export default {
       }
 
       return this.modules.find(({ moduleID }) => moduleID === this.feed.options.moduleID)
+    },
+
+    moduleOptions () {
+      return [
+        { moduleID: '0', name: this.$t('calendar.recordFeed.modulePlaceholder') },
+        ...this.modules,
+      ]
     },
 
     /**

@@ -537,6 +537,7 @@
         :label="$t('page-layout.roles.label')"
         label-class="text-primary"
       >
+        <!-- why is value an array. Q for Jo -->
         <c-input-select
           v-model="currentLayoutRoles"
           :options="roles.options"

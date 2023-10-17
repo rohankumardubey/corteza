@@ -74,6 +74,7 @@
           <option value="">
             {{ $t('general.label.none') }}
           </option>
+
           <option
             v-for="(field, index) in selectedModuleFieldsByType('String')"
             :key="index"

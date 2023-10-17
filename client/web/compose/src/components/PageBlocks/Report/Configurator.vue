@@ -6,14 +6,15 @@
           :label="$t('report.label')"
           label-class="text-primary"
         >
-          <b-form-select
+          <c-input-select
             v-model="options.reportID"
             :options="reportOptions"
-            text-field="label"
-            value-field="reportID"
+            :reduce="o => o.reportID"
+            append-to-body
           />
         </b-form-group>
       </b-col>
+
       <b-col
         v-if="selectedReport && scenarioOptions.length > 1"
       >
@@ -21,11 +22,11 @@
           :label="$t('report.scenario.label')"
           label-class="text-primary"
         >
-          <b-form-select
+          <c-input-select
             v-model="options.scenarioID"
             :options="scenarioOptions"
-            text-field="label"
-            value-field="scenarioID"
+            :reduce="o => o.scenarioID"
+            append-to-body
           />
         </b-form-group>
       </b-col>
@@ -37,12 +38,32 @@
       :description="$t('report.element.description')"
       label-class="text-primary"
     >
-      <b-form-select
+      <c-input-select
         v-model="options.elementID"
         :options="elementOptions"
-        text-field="name"
-        value-field="elementID"
-      />
+        :reduce="reduceElement"
+        :get-option-label="getOptionLabel"
+        append-to-body
+      >
+        <template #option="option">
+          <div v-if="option.options">
+            <strong>{{ option.label }}</strong>
+
+            <ul class="list-unstyled">
+              <li
+                v-for="subOption in option.options"
+                :key="subOption.name"
+                class="ml-2"
+              >
+                {{ subOption.name }}
+              </li>
+            </ul>
+          </div>
+          <div v-else>
+            {{ option.name }}
+          </div>
+        </template>
+      </c-input-select>
     </b-form-group>
   </b-tab>
 </template>
@@ -131,6 +152,26 @@ export default {
 
     setDefaultValues () {
       this.reports = []
+    },
+
+    reduceElement (o) {
+      if (o.elementID === '0') {
+        return o.elementID
+      }
+      const element = this.elementOptions.find(e => e.label === o.label)
+      if (element) {
+        return element.options[0].elementID
+      }
+    },
+
+    getOptionLabel (o) {
+      if (o.elementID === '0') {
+        return o.name
+      }
+      const element = this.elementOptions.find(e => e.label === o.label)
+      if (element) {
+        return element.options[0].name
+      }
     },
   },
 }

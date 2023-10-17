@@ -77,22 +77,14 @@
                 :label="$t('metric.edit.moduleLabel')"
                 label-class="text-primary"
               >
-                <b-form-select
+                <c-input-select
                   v-model="edit.moduleID"
                   :options="modules"
-                  text-field="name"
+                  label="name"
                   class="mt-1"
-                  value-field="moduleID"
-                >
-                  <template slot="first">
-                    <option
-                      :value="undefined"
-                      disabled
-                    >
-                      {{ $t('metric.edit.modulePlaceholder') }}
-                    </option>
-                  </template>
-                </b-form-select>
+                  :reduce="o => o.moduleID"
+                  :placeholder="$t('metric.edit.modulePlaceholder')"
+                />
               </b-form-group>
 
               <!-- <b-form-group

@@ -30,22 +30,13 @@
             class="align-middle"
             style="min-width: 250px;"
           >
-            <b-form-select
+            <c-input-select
               v-model="column.field"
               :options="availableFields"
-              text-field="label"
-              value-field="name"
+              :reduce="o => o.name"
+              :placeholder="labels.none"
               class="rounded"
-            >
-              <template #first>
-                <b-form-select-option
-                  :value="undefined"
-                  disabled
-                >
-                  {{ labels.none }}
-                </b-form-select-option>
-              </template>
-            </b-form-select>
+            />
           </td>
 
           <td
