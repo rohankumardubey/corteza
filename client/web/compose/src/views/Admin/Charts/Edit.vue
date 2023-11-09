@@ -96,15 +96,13 @@
                         label-class="text-primary"
                       >
                         <b-input-group class="d-flex w-100">
-                          <vue-select
+                          <c-input-select
                             v-model="chart.config.colorScheme"
                             :options="colorSchemes"
                             :reduce="cs => cs.id"
                             label="name"
                             :get-option-key="o => o.id"
                             :placeholder="$t('colorScheme.placeholder')"
-                            :calculate-position="calculateDropdownPosition"
-                            class="bg-white rounded"
                           >
                             <template #option="option">
                               <p
@@ -112,6 +110,7 @@
                               >
                                 {{ option.name }}
                               </p>
+
                               <div
                                 v-for="(color, index) in option.colors"
                                 :key="index"
@@ -134,7 +133,7 @@
                                 </b-button>
                               </li>
                             </template>
-                          </vue-select>
+                          </c-input-select>
 
                           <b-input-group-append v-if="showEditColorSchemeButton">
                             <b-button

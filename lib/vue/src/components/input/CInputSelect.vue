@@ -6,6 +6,7 @@
       :options="options"
       :searchable="searchable"
       :calculate-position="calculateDropdownPosition"
+      class="bg-white rounded"
       v-on="$listeners"
     >
       <template
@@ -34,8 +35,8 @@ export default {
 
   props: {
     value: {
-      type: String,
-      default: '',
+      type: [String, Array],
+      default: () => '',
     },
 
     options: {

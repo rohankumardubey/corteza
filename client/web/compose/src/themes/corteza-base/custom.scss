@@ -140,6 +140,15 @@ th {
     fill: var(--gray-900);
     display: inline-flex;
   }
+  
+  .vs__clear {
+    fill: rgba(60, 60, 60, .5);
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+    margin-right: 8px
+  }
 }
 
 .vs__dropdown-menu {

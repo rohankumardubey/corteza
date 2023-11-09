@@ -9,11 +9,13 @@
         v-model="options.profileSourceField"
         :options="selectOptions"
       />
-    </fieldset>
+    </b-form-group>
 
-    <fieldset class="form-group">
-      <label>{{ $t('socialFeed.twitterProfileLabel') }}</label>
-      <input
+    <b-form-group
+      :label="$t('socialFeed.twitterProfileLabel')"
+      label-class="text-primary"
+    >
+      <b-input
         v-model="options.profileUrl"
       />
     </b-form-group>

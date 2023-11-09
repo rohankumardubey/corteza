@@ -11,11 +11,10 @@
           :options="filteredNamespaces"
           :get-option-key="getOptionKey"
           :get-option-label="getOptionLabel"
-          :value="namespace.name.namespaceID"
+          :value="namespace.namespaceID"
           :selectable="option => option.namespaceID !== namespace.namespaceID"
           :placeholder="$t('pickNamespace')"
           :autoscroll="false"
-          class="bg-white rounded"
           @option:selected="namespaceSelected"
         >
           <template #list-header>
