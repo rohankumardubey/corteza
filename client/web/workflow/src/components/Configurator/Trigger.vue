@@ -124,16 +124,13 @@
               <samp>{{ c.values.join(' or ') }}</samp>
             </div>
 
-            <b-button
+            <c-input-confirm
               v-if="c._showDetails"
+              show-icon
               variant="outline-danger"
-              class="position-absolute trash border-0"
-              @click="removeConstraint(index)"
-            >
-              <font-awesome-icon
-                :icon="['far', 'trash-alt']"
-              />
-            </b-button>
+              class="position-absolute trash text-danger border-0"
+              @confirmed="removeConstraint(index)"
+            />
           </template>
 
           <template #row-details="{ item: c }">
@@ -202,15 +199,12 @@
                     @input="$root.$emit('change-detected')"
                   />
 
-                  <b-button
+                  <c-input-confirm
+                    show-icon
                     variant="outline-danger"
-                    class="ml-1 border-0"
-                    @click="c.values.splice(index, 1)"
-                  >
-                    <font-awesome-icon
-                      :icon="['far', 'trash-alt']"
-                    />
-                  </b-button>
+                    class="text-danger border-0"
+                    @confirmed="c.values.splice(index, 1)"
+                  />
                 </b-input-group>
               </b-form-group>
             </b-card>

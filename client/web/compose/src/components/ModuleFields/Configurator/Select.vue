@@ -81,13 +81,12 @@
               </b-td>
 
               <b-td class="d-flex align-items-center justify-content-center">
-                <b-button
-                  variant="outline-danger"
+                <c-input-confirm
+                  show-icon
                   class="border-0"
-                  @click.prevent="f.options.options.splice(index, 1)"
-                >
-                  <font-awesome-icon :icon="['far', 'trash-alt']" />
-                </b-button>
+                  variant="outline-danger"
+                  @confirmed="f.options.options.splice(index, 1)"
+                />
               </b-td>
             </b-tr>
 

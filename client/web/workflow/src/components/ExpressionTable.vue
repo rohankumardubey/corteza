@@ -42,17 +42,13 @@
             >
               <samp class="text-truncate">{{ item[field.key] }}</samp>
 
-              <b-button
+              <c-input-confirm
                 v-if="item._showDetails"
+                show-icon
                 variant="outline-danger"
-                size="sm"
-                class="border-0"
-                @click="$emit('remove', index)"
-              >
-                <font-awesome-icon
-                  :icon="['far', 'trash-alt']"
-                />
-              </b-button>
+                class="text-danger border-0"
+                @confirmed="$emit('remove', index)"
+              />
             </div>
 
             <var

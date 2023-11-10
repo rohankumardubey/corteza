@@ -31,13 +31,13 @@
             v-if="feed.resource"
             v-slot:append
           >
-            <b-button
+            <c-input-confirm
+              show-icon
               variant="outline-danger"
               class="border-0"
-              @click="onRemoveFeed(i)"
-            >
-              <font-awesome-icon :icon="['far', 'trash-alt']" />
-            </b-button>
+              size="md"
+              @confirmed="onRemoveFeed(i)"
+            />
           </template>
         </b-input-group>
       </b-form-group>

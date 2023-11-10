@@ -10,14 +10,12 @@
       :fields="fields"
     >
       <template #cell(editor)="{ item }">
-        <b-button
-          data-test-id="button-remove-provider"
-          variant="link"
-          class="pr-0"
-          @click="$emit('delete', item.credentialsID)"
-        >
-          <font-awesome-icon :icon="['far', 'trash-alt']" />
-        </b-button>
+        <c-input-confirm
+          show-icon
+          variant="outline-danger"
+          class="text-danger border-0"
+          @confirmed="$emit('delete', item.credentialsID)"
+        />
       </template>
     </b-table>
     <template #header>

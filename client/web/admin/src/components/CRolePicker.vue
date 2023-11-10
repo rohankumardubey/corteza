@@ -47,8 +47,6 @@
 <script>
 import { debounce } from 'lodash'
 import { VueSelect } from 'vue-select'
-import { components } from '@cortezaproject/corteza-vue/'
-const { CInputConfirm } = components
 
 function roleSorter (a, b) {
   return `${a.name} ${a.handle} ${a.roleID}`.localeCompare(`${b.name} ${b.handle} ${b.roleID}`)
@@ -57,7 +55,6 @@ function roleSorter (a, b) {
 export default {
   components: {
     VueSelect,
-    CInputConfirm,
   },
 
   props: {

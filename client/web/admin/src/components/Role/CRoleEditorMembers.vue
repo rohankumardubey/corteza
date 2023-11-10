@@ -72,8 +72,6 @@
 <script>
 import { debounce } from 'lodash'
 import { VueSelect } from 'vue-select'
-import { components } from '@cortezaproject/corteza-vue/'
-const { CInputConfirm } = components
 
 export default {
   i18nOptions: {
@@ -83,7 +81,6 @@ export default {
 
   components: {
     VueSelect,
-    CInputConfirm,
   },
 
   props: {

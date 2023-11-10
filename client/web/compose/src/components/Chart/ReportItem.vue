@@ -21,13 +21,13 @@
       >
         <font-awesome-icon :icon="['far', 'edit']" />
       </b-btn>
-      <b-btn
-        variant="link"
-        class="float-right text-danger p-0"
-        @click="$emit('remove', report)"
-      >
-        <font-awesome-icon :icon="['far', 'trash-alt']" />
-      </b-btn>
+
+      <c-input-confirm
+        show-icon
+        variant="outline-danger"
+        class="text-danger border-0 float-right"
+        @confirmed="$emit('remove', report)"
+      />
     </td>
   </tr>
 </template>

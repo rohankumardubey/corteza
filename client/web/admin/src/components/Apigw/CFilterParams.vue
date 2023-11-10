@@ -89,14 +89,11 @@
             />
 
             <b-input-group-append>
-              <b-button
+              <c-input-confirm
+                show-icon
                 variant="danger"
-                @click="param.value.splice(hIndex, 1)"
-              >
-                <font-awesome-icon
-                  :icon="['far', 'trash-alt']"
-                />
-              </b-button>
+                @confirmed="param.value.splice(hIndex, 1)"
+              />
             </b-input-group-append>
           </b-input-group>
 
