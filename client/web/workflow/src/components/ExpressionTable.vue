@@ -45,7 +45,6 @@
               <c-input-confirm
                 v-if="item._showDetails"
                 show-icon
-                variant="outline-danger"
                 @confirmed="$emit('remove', index)"
               />
             </div>

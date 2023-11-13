@@ -40,7 +40,7 @@
               v-for="(option, index) in f.options.options"
               :key="index"
             >
-              <b-td class="d-flex align-items-center justify-content-center align-middle">
+              <b-td class="align-middle">
                 <font-awesome-icon
                   :icon="['fas', 'bars']"
                   class="grab text-light"
@@ -80,7 +80,7 @@
                 </b-input-group>
               </b-td>
 
-              <b-td class="align-middle">
+              <b-td class="align-middle text-right">
                 <c-input-confirm
                   show-icon
                   @confirmed="f.options.options.splice(index, 1)"

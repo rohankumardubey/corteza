@@ -24,7 +24,6 @@
 
       <c-input-confirm
         show-icon
-        variant="outline-danger"
         class="float-right"
         @confirmed="$emit('remove', report)"
       />
