@@ -41,8 +41,6 @@
           <b-input-group-append>
             <c-input-confirm
               show-icon
-              variant="link"
-              class="text-danger border-0"
               @confirmed="dimension.meta.steps.splice(i, 1)"
             />
           </b-input-group-append>

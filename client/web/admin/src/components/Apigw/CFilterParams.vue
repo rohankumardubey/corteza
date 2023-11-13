@@ -91,7 +91,6 @@
             <b-input-group-append>
               <c-input-confirm
                 show-icon
-                variant="danger"
                 @confirmed="param.value.splice(hIndex, 1)"
               />
             </b-input-group-append>

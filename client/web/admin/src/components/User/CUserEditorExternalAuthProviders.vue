@@ -11,9 +11,8 @@
     >
       <template #cell(editor)="{ item }">
         <c-input-confirm
+          data-test-id="button-remove-provider"
           show-icon
-          variant="outline-danger"
-          class="text-danger border-0"
           @confirmed="$emit('delete', item.credentialsID)"
         />
       </template>

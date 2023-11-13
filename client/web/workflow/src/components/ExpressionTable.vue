@@ -46,7 +46,6 @@
                 v-if="item._showDetails"
                 show-icon
                 variant="outline-danger"
-                class="text-danger border-0"
                 @confirmed="$emit('remove', index)"
               />
             </div>

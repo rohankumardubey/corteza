@@ -33,8 +33,6 @@
           >
             <c-input-confirm
               show-icon
-              variant="outline-danger"
-              class="border-0"
               size="md"
               @confirmed="onRemoveFeed(i)"
             />

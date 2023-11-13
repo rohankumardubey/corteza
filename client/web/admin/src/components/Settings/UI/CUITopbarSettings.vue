@@ -106,8 +106,6 @@
                 <template #cell(actions)="data">
                   <c-input-confirm
                     show-icon
-                    variant="outline-danger"
-                    class="text-danger border-0"
                     @confirmed="topbarSettings.helpLinks.splice(data.index, 1)"
                   />
                 </template>
@@ -182,8 +180,6 @@
                 <template #cell(actions)="data">
                   <c-input-confirm
                     show-icon
-                    variant="outline-danger"
-                    class="text-danger border-0"
                     @confirmed="topbarSettings.profileLinks.splice(data.index, 1)"
                   />
                 </template>

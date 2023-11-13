@@ -25,7 +25,7 @@
       <c-input-confirm
         show-icon
         variant="outline-danger"
-        class="text-danger border-0 float-right"
+        class="float-right"
         @confirmed="$emit('remove', report)"
       />
     </td>

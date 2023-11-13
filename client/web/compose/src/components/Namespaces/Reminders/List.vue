@@ -60,11 +60,9 @@
                 </b-button>
 
                 <c-input-confirm
-                  show-icon
                   data-test-id="button-delete-reminder"
-                  variant="outline-danger"
+                  show-icon
                   :tooltip="$t('reminder.delete')"
-                  class="py-2 border-0"
                   @confirmed="$emit('delete', r)"
                 />
               </b-button-group>

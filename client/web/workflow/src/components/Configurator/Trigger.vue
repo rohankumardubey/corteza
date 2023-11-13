@@ -127,8 +127,8 @@
             <c-input-confirm
               v-if="c._showDetails"
               show-icon
-              variant="outline-danger"
-              class="position-absolute trash text-danger border-0"
+              class="position-absolute trash"
+              size="md"
               @confirmed="removeConstraint(index)"
             />
           </template>
@@ -201,8 +201,6 @@
 
                   <c-input-confirm
                     show-icon
-                    variant="outline-danger"
-                    class="text-danger border-0"
                     @confirmed="c.values.splice(index, 1)"
                   />
                 </b-input-group>
