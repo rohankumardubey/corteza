@@ -3,22 +3,15 @@
     <div class="my-2">
       <c-map
         ref="c-map"
-        :map="{
-          zoom: options.zoomStarting,
-          minZoom: options.zoomMin,
-          maxZoom: options.zoomMax,
-          center: options.center,
-          bounds,
-          maxBounds: options.bounds,
-          attribution: map.attribution
+        :map="mapOptions"
+        :labels="{
+          tooltip: { 'goToCurrentLocation': $t('geometry.tooltip.goToCurrentLocation') },
+          geosearchInputPlaceholder: $t('geometry.tooltip.geosearchInputPlaceholder')
         }"
-        :label="{
-          tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
-        }"
-        style="height: 45vh;"
-        @on-go-to-current-location="goToCurrentLocation"
-        @on-map-ref="onMapRefEmit"
+        map-style="height: 45vh;"
         @on-bounds-update="boundsUpdated"
+        @on-center="updateCenter"
+        @on-zoom="options.zoomStarting = $event"
       />
 
       <b-form-text id="password-help-block">
@@ -142,18 +135,10 @@ export default {
 
   data () {
     return {
-      map: {
-        show: false,
-        zoom: 3,
-        center: [30, 30],
-        rotation: 0,
-        attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a>',
-      },
-
+      map: {},
       localValue: { coordinates: [] },
       center: [],
       bounds: null,
-      mapRef: undefined,
     }
   },
 
@@ -164,6 +149,28 @@ export default {
         { value: 'newTab', text: this.$t('geometry.openInNewTab') },
         { value: 'modal', text: this.$t('geometry.openInModal') },
       ]
+    },
+
+    mapOptions: {
+      get () {
+        return {
+          zoom: this.options.zoomStarting,
+          minZoom: this.options.zoomMin,
+          maxZoom: this.options.zoomMax,
+          center: this.options.center,
+          bounds: this.bounds,
+          maxBounds: this.options.bounds,
+        }
+      },
+
+      set (options) {
+        options.zoomStarting = options.zoom
+        options.zoomMin = options.minZoom
+        options.zoomMax = options.maxZoom
+
+        this.$emit('options', options)
+        this.$emit('bounds', options.bounds || this.bounds)
+      },
     },
   },
 
@@ -193,7 +200,7 @@ export default {
 
     updateBounds (value) {
       if (value) {
-        const bounds = this.bounds || this.mapRef.mapObject.getBounds()
+        const bounds = this.bounds || this.bounds
         const { _northEast, _southWest } = bounds
 
         this.options.bounds = [Object.values(_northEast), Object.values(_southWest)]
@@ -202,24 +209,11 @@ export default {
       }
     },
 
-    goToCurrentLocation () {
-      this.mapRef.mapObject.locate()
-    },
-
-    onLocationFound ({ latitude, longitude }) {
-      const zoom = this.mapRef.mapObject._zoom >= 13 ? this.mapRef.mapObject._zoom : 13
-      this.mapRef.mapObject.flyTo([latitude, longitude], zoom)
-    },
-
     setDefaultValues () {
       this.map = {}
       this.localValue = {}
       this.center = []
       this.bounds = null
-    },
-
-    onMapRefEmit (map) {
-      this.mapRef = map
     },
   },
 }

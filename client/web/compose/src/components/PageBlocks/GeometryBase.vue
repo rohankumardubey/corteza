@@ -14,8 +14,6 @@
     <div
       v-else
       class="w-100 h-100"
-      @mouseover="disableMap"
-      @mouseleave="enableMap"
     >
       <c-map
         ref="c-map"
@@ -23,25 +21,17 @@
           ...map,
           maxBounds: map.bounds
         }"
-        :label="{
-          tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
+        :labels="{
+          tooltip: { 'goToCurrentLocation': $t('geometry.tooltip.goToCurrentLocation') }
         }"
-        :polygon-geometries="geometries"
-        :polygon-colors="colors"
+        :markers="localValue"
+        :disable="editable"
+        :hide-geo-search="true"
+        :polygons="geometries"
         class="w-100 h-100"
-        @on-location-found="onLocationFound"
-        @on-map-ref="onMapRefEmit"
-      >
-        <template #markers>
-          <l-marker
-            v-for="(marker, i) in localValue"
-            :key="`marker-${i}`"
-            :lat-lng="marker.value"
-            :icon="getIcon(marker)"
-            @click="onMarkerCLick(marker.recordID, marker.moduleID)"
-          />
-        </template>
-      </c-map>
+        @on-marker-marker="onMarkerCLick"
+        @trigger-geosearch-error="triggerGeoSearchError"
+      />
     </div>
   </wrap>
 </template>
@@ -82,7 +72,6 @@ export default {
       markers: [],
 
       cancelTokenSource: axios.CancelToken.source(),
-      mapRef: undefined,
     }
   },
 
@@ -101,7 +90,7 @@ export default {
             value.markers.map(subValue => {
               if (this.getLatLng(subValue)) {
                 values.push({
-                  value: this.getLatLng(subValue) || {},
+                  ...(this.getLatLng(subValue) || {}),
                   color: value.color,
                   recordID: value.recordID,
                   moduleID: value.moduleID,
@@ -113,6 +102,16 @@ export default {
       })
 
       return values
+    },
+
+    polygons () {
+      const polygons = []
+
+      for (let i = 0; i < this.geometries.length; i++) {
+
+      }
+
+      return polygons
     },
   },
 
@@ -230,11 +229,6 @@ export default {
           })
       })).finally(() => {
         this.processing = false
-
-        setTimeout(() => {
-          if (!this.mapRef) return
-          this.mapRef.mapObject.invalidateSize()
-        })
       })
     },
 
@@ -267,24 +261,7 @@ export default {
       }
     },
 
-    disableMap () {
-      if (this.editable) this.mapRef.mapObject._handlers.forEach(handler => handler.disable())
-    },
-
-    enableMap () {
-      if (this.editable) this.mapRef.mapObject._handlers.forEach(handler => handler.enable())
-    },
-
-    goToCurrentLocation () {
-      this.mapRef.mapObject.locate()
-    },
-
-    onLocationFound ({ latitude, longitude }) {
-      const zoom = this.mapRef.mapObject._zoom >= 13 ? this.mapRef.mapObject._zoom : 13
-      this.mapRef.mapObject.flyTo([latitude, longitude], zoom)
-    },
-
-    onMarkerCLick (recordID, moduleID) {
+    onMarkerCLick ({ marker: { recordID, moduleID } }) {
       const page = this.pages.find(p => p.moduleID === moduleID)
       if (!page) {
         return
@@ -313,6 +290,10 @@ export default {
       this.loadEvents()
     },
 
+    triggerGeoSearchError () {
+      this.toastErrorHandler(this.$t('notification:field-geometry.geolocationErrors.locationSearchFailed'))()
+    },
+
     setDefaultValues () {
       this.map = undefined
       this.processing = false
@@ -328,10 +309,6 @@ export default {
 
     destroyEvents () {
       this.$root.$off('module-records-updated', this.refreshOnRelatedRecordsUpdate)
-    },
-
-    onMapRefEmit (map) {
-      this.mapRef = map
     },
   },
 }

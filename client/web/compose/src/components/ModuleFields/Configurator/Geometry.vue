@@ -21,18 +21,14 @@
     >
       <c-map
         ref="c-map"
-        :field="field"
         :map="{
           zoom,
           center,
-          attribution
         }"
-        :label="{
+        :labels="{
           tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
         }"
-        :on-location-found="onLocationFound"
-        :on-go-to-current-location="goToCurrentLocation"
-        @on-map-ref="onMapRefEmit"
+        map-style="height: 50vh;"
         @on-zoom="f.options.zoom = $event"
         @on-center="f.options.center = $event"
       />
@@ -57,13 +53,6 @@ export default {
 
   extends: base,
 
-  data () {
-    return {
-      attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a>',
-      mapRef: undefined,
-    }
-  },
-
   computed: {
     center () {
       return this.f.options.center || [30, 30]
@@ -71,21 +60,6 @@ export default {
 
     zoom () {
       return this.f.options.zoom || 3
-    },
-  },
-
-  methods: {
-    goToCurrentLocation () {
-      this.$refs.map.mapObject.locate()
-    },
-
-    onMapRefEmit (map) {
-      this.mapRef = map
-    },
-
-    onLocationFound ({ latitude, longitude }) {
-      const zoom = this.$refs.map.mapObject._zoom >= 13 ? this.$refs.map.mapObject._zoom : 13
-      this.$refs.map.mapObject.flyTo([latitude, longitude], zoom)
     },
   },
 }

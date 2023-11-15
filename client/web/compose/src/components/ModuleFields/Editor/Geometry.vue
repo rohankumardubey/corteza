@@ -156,45 +156,20 @@
         {{ $t('clickToPlaceMarker') }}
       </template>
 
-      <div
-        v-if="!field.options.hideGeoSearch"
-        class="geosearch-container"
-      >
-        <c-input-search
-          v-model="geoSearch.query"
-          :placeholder="$t('geosearchInputPlaceholder')"
-          :autocomplete="'off'"
-          :debounce="300"
-          @input="onGeoSearch"
-        />
-
-        <div class="geosearch-results">
-          <div
-            v-for="(result, idx) in geoSearch.results"
-            :key="idx"
-            class="geosearch-result"
-            @click="placeGeoSearchMarker(result)"
-          >
-            {{ result.label }}
-          </div>
-        </div>
-      </div>
-
       <c-map
         ref="c-map"
         :field="field"
         :map="map"
-        :on-location-found="onLocationFound"
-        :hide-current-location-button="!field.options.hideCurrentLocationButton"
-        :local-value-index="localValueIndex"
+        :hide-geo-search="!field.options.hideGeoSearch"
+        :hide-current-location-button="field.options.hideCurrentLocationButton"
+        :active-marker-index="localValueIndex"
         :markers="markers"
-        :label="{
+        :labels="{
           tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
         }"
-        @on-go-to-current-location="goToCurrentLocation"
-        @on-place-marker="placeMarker($event)"
-        @on-remove-marker="removeMarker"
-        @on-map-ref="onMapRefEmit"
+        @on-map-click="placeMarker"
+        @on-marker-marker="removeMarker"
+        @trigger-geosearch-error="triggerGeoSearchError"
       />
     </b-modal>
   </b-form-group>
@@ -202,10 +177,9 @@
 <script>
 import base from './base'
 import { latLng } from 'leaflet'
-import { OpenStreetMapProvider } from 'leaflet-geosearch'
 import { components } from '@cortezaproject/corteza-vue'
 import { isNumber } from 'lodash'
-const { CInputSearch, CMap } = components
+const { CMap } = components
 
 export default {
   i18nOptions: {
@@ -214,7 +188,6 @@ export default {
   },
 
   components: {
-    CInputSearch,
     CMap,
   },
 
@@ -227,19 +200,7 @@ export default {
 
       map: {
         show: false,
-        zoom: 3,
-        center: [30, 30],
-        rotation: 0,
-        attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a>',
       },
-
-      geoSearch: {
-        query: '',
-        provider: new OpenStreetMapProvider(),
-        results: [],
-      },
-
-      mapRef: undefined,
     }
   },
 
@@ -294,10 +255,6 @@ export default {
 
       this.map.zoom = index >= 0 ? 13 : this.field.options.zoom
       this.map.show = true
-
-      setTimeout(() => {
-        this.mapRef.mapObject.invalidateSize()
-      }, 100)
     },
 
     getLatLng (coordinates = [undefined, undefined]) {
@@ -328,9 +285,9 @@ export default {
       }
     },
 
-    removeMarker (i) {
+    removeMarker ({ index }) {
       if (this.field.isMulti) {
-        this.localValue.splice(i, 1)
+        this.localValue.splice(index, 1)
       } else {
         this.localValue = { coordinates: [] }
       }
@@ -369,52 +326,14 @@ export default {
       }
     },
 
-    goToCurrentLocation () {
-      this.mapRef.mapObject.locate()
-    },
-
-    onLocationFound ({ latitude, longitude }) {
-      const zoom = this.mapRef.mapObject._zoom >= 15 ? this.mapRef.mapObject._zoom : 15
-      const latlng = { lat: latitude, lng: longitude }
-      this.placeMarker({ latlng })
-      this.mapRef.mapObject.flyTo([latitude, longitude], zoom)
-    },
-
-    placeGeoSearchMarker (result) {
-      const zoom = this.mapRef.mapObject._zoom >= 15 ? this.mapRef.mapObject._zoom : 15
-      this.mapRef.mapObject.flyTo([result.latlng.lat, result.latlng.lng], zoom, { animate: false })
-      this.placeMarker(result)
-      this.geoSearch.results = []
-    },
-
-    onGeoSearch (query) {
-      if (!query) {
-        this.geoSearch.results = []
-        return
-      }
-
-      this.geoSearch.provider.search({ query }).then(results => {
-        this.geoSearch.results = results.map(result => ({
-          ...result,
-          latlng: {
-            lat: result.raw.lat,
-            lng: result.raw.lon,
-          },
-        }))
-      }).catch(() => {
-        this.toastErrorHandler(this.$t('notification:field-geometry.geolocationErrors.locationSearchFailed'))()
-      })
+    triggerGeoSearchError () {
+      this.toastErrorHandler(this.$t('notification:field-geometry.geolocationErrors.locationSearchFailed'))()
     },
 
     setDefaultValues () {
       this.localValue = undefined
       this.localValueIndex = undefined
       this.map = {}
-      this.geoSearch = {}
-    },
-
-    onMapRefEmit (map) {
-      this.mapRef = map
     },
   },
 }

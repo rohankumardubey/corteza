@@ -793,6 +793,7 @@ geometry:
     lowerRight: Bounds lower right
   tooltip:
       goToCurrentLocation: Go to current location
+      geosearchInputPlaceholder: Enter address, place or postcode
 
 tabs:
   alertTitle: Set a title for your block

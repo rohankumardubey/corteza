@@ -24,43 +24,18 @@
       body-class="p-0"
       hide-footer
     >
-      <div
-        v-if="!field.options.hideGeoSearch"
-        class="geosearch-container"
-      >
-        <c-input-search
-          v-model="geoSearch.query"
-          :placeholder="$t('geosearchInputPlaceholder')"
-          :autocomplete="'off'"
-          :debounce="300"
-          @input="onGeoSearch"
-        />
-
-        <div class="geosearch-results">
-          <div
-            v-for="(result, idx) in geoSearch.results"
-            :key="idx"
-            class="geosearch-result"
-            @click="placeGeoSearchMarker(result)"
-          >
-            {{ result.label }}
-          </div>
-        </div>
-      </div>
-
       <c-map
         ref="c-map"
         :field="field"
         :map="map"
-        :local-value-index="localValueIndex"
+        :active-marker-index="localValueIndex"
         :markers="localValue"
-        :hide-current-location-button="!field.options.hideCurrentLocationButton"
-        :label="{
+        :hide-current-location-button="field.options.hideCurrentLocationButton"
+        :hide-geo-search="!field.options.hideGeoSearch"
+        :labels="{
           tooltip: { 'goToCurrentLocation': $t('tooltip.goToCurrentLocation') }
         }"
-        @on-location-found="onLocationFound"
-        @on-go-to-current-location="goToCurrentLocation"
-        @on-map-ref="onMapRefEmit"
+        @trigger-geosearch-error="triggerGeoSearchError"
       />
     </b-modal>
 
@@ -73,7 +48,7 @@ import { latLng } from 'leaflet'
 import { OpenStreetMapProvider } from 'leaflet-geosearch'
 import { components } from '@cortezaproject/corteza-vue'
 import { isNumber } from 'lodash'
-const { CInputSearch, CMap } = components
+const { CMap } = components
 
 export default {
   i18nOptions: {
@@ -82,7 +57,6 @@ export default {
   },
 
   components: {
-    CInputSearch,
     CMap,
   },
 
@@ -104,8 +78,6 @@ export default {
         provider: new OpenStreetMapProvider(),
         results: [],
       },
-
-      mapRef: undefined,
     }
   },
 
@@ -126,19 +98,11 @@ export default {
   },
 
   methods: {
-    onMapRefEmit (map) {
-      this.mapRef = map
-    },
-
     openMap (index) {
       this.localValueIndex = index
       this.map.center = this.localValue[index] || this.field.options.center
       this.map.zoom = index >= 0 ? 13 : this.field.options.zoom
       this.map.show = true
-
-      setTimeout(() => {
-        this.mapRef.mapObject.invalidateSize()
-      }, 100)
     },
 
     getLatLng (coordinates = [undefined, undefined]) {
@@ -149,38 +113,8 @@ export default {
       }
     },
 
-    goToCurrentLocation () {
-      this.mapRef.mapObject.locate()
-    },
-
-    onLocationFound ({ latitude, longitude }) {
-      const zoom = this.mapRef.mapObject._zoom >= 13 ? this.mapRef.mapObject._zoom : 13
-      this.mapRef.mapObject.flyTo([latitude, longitude], zoom)
-    },
-
-    placeGeoSearchMarker (result) {
-      const zoom = this.mapRef.mapObject._zoom >= 15 ? this.mapRef.mapObject._zoom : 15
-      this.mapRef.mapObject.flyTo([result.latlng.lat, result.latlng.lng], zoom, { animate: false })
-      this.geoSearch.results = []
-    },
-
-    onGeoSearch (query) {
-      if (!query) {
-        this.geoSearch.results = []
-        return
-      }
-
-      this.geoSearch.provider.search({ query }).then(results => {
-        this.geoSearch.results = results.map(result => ({
-          ...result,
-          latlng: {
-            lat: result.raw.lat,
-            lng: result.raw.lon,
-          },
-        }))
-      }).catch(() => {
-        this.toastErrorHandler(this.$t('notification:field-geometry.geolocationErrors.locationSearchFailed'))()
-      })
+    triggerGeoSearchError () {
+      this.toastErrorHandler(this.$t('notification:field-geometry.geolocationErrors.locationSearchFailed'))()
     },
 
     setDefaultValues () {
