@@ -1,0 +1,50 @@
+version: "3.5"
+
+services:
+  backend:
+    image: golang:latest
+    volumes:
+      - "${PWD}/corteza:/corteza"
+    entrypoint: |
+      sh -c "
+        git config --global --add safe.directory /corteza &&
+        cd /corteza/server &&
+        make watch
+      "
+
+    networks: [corteza]
+    working_dir: /corteza/server
+    environment:
+      - DB_DSN=postgres://corteza:root@postgres:5432/corteza_cy_test?sslmode=disable
+      - GIN_ARG_LADDR=0.0.0.0
+    ports:
+      - 3001:3001
+      - 3000:3000
+
+  postgres:
+    image: postgres:15
+    networks: [corteza]
+    environment:
+      POSTGRES_USER: corteza
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: corteza_cy_test
+
+  admin:
+    image: node:16.20-alpine3.16
+    volumes:
+      - "${PWD}/corteza:/corteza"
+    ports:
+      - 8081:8080
+    networks: [corteza]
+    working_dir: /corteza/client/web/admin
+    environment:
+      BUILD_VERSION: 2023.3.6-3-g251c05abf
+
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+
+networks:
+  corteza:
+    name: corteza

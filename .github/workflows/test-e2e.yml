@@ -1,0 +1,177 @@
+name: "Test on main branch push"
+
+# These jobs can be tested with nektos/act tool
+# https://github.com/nektos/act
+#
+# Look for "!env.ACT" in the DRY_RUN expression below
+
+on:
+  push:
+    branches:
+      - "2023.9.x-feature-e2e"
+
+env:
+  BUILD_OS: linux
+  BUILD_ARCH: amd64
+
+  GO_VERSION: 1.19
+  GOFLAGS: -mod=readonly
+
+  NODE_VERSION: 16
+
+jobs:
+  server-client-test:
+    name: ""
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/setup-node@v3
+        with: { node-version: "${{ env.NODE_VERSION }}" }
+
+      - uses: actions/setup-go@v3
+        with: { go-version: "${{ env.GO_VERSION }}" }
+
+      - uses: KengoTODA/actions-setup-docker-compose@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Setup YARN"
+        run: npm install -g yarn @vue/cli-service
+
+      - name: Checkout corteza repo
+        uses: actions/checkout@v3
+        with:
+          path: corteza
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: 2023.9.x-feature-e2e
+
+      - name: Update config file in webapps
+        run: |
+          cd corteza
+          cp client/web/compose/public/config.example.js client/web/compose/public/config.js
+          sed -i -e 's/https:\/\/api.cortezaproject.your-domain.tld/\/\/localhost:3000\/api/g' client/web/compose/public/config.js
+
+      - name: Build packages
+        working-directory: corteza
+        run: |
+          cd lib/js
+          yarn install
+          yarn build
+          yarn link
+
+          cd ../vue
+          yarn install
+          yarn build
+          yarn link
+      
+      - name: Connect packages
+        working-directory: corteza
+        run: |
+          cd client/web/admin
+          yarn link @cortezaproject/corteza-vue
+          yarn link @cortezaproject/corteza-js
+          yarn install
+
+      - name: Run Corteza Docker compose
+        working-directory: corteza
+        run: |
+          docker-compose up -d
+          docker ps
+
+      - name: Clone CY repo
+        uses: actions/checkout@v3
+        with:
+          repository: cortezaproject/corteza-e2e-cypress
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: 2023.9.x-feature-e2e
+          path: corteza-e2e-cypress
+
+      - name: Run CY Docker compose
+        env:
+          CORTEZA_VERSION: 2023.3.8
+          CYPRESS_VERSION: 9.5.1
+          CYPRESS_HOST: http://backend:3000
+          CYPRESS_BASE_URL: http://backend:3000
+          CYPRESS_ADMIN_URL: http://admin:8080
+          CYPRESS_COMPOSE_URL: http://localhost:8082
+          CYPRESS_WORKFLOW_URL: http://localhost:8083
+          CYPRESS_REPORTER_URL: http://localhost:8084
+          CYPRESS_ONE_URL: http://localhost:8085
+          CYPRESS_PRIVACY_URL: http://localhost:8086
+          CYPRESS_USER_EMAIL: cypress@test.com
+          CYPRESS_USER_PASSWORD: cypress123
+          CYPRESS_USER_PASSWORD_NEW: newcypress123
+          CYPRESS_USER_EMAIL_NEW: permissions@email.com
+          CYPRESS_USER_DPO: dpo@email.com
+          CYPRESS_USER_DPO_PASSWORD: dpo@email.com
+        working-directory: corteza-e2e-cypress
+        run: |
+          docker ps
+          ls
+          yarn install
+          docker-compose --project-directory . run \
+            --entrypoint='cypress run 
+             --spec cypress/integration/basic-functionalities/server/Create_user.spec.js
+             --browser chrome' \
+            cypress
+        # client-web-test:
+        #   name: "Web client test (${{ matrix.app }})"
+        #   runs-on: ubuntu-20.04
+        #   strategy:
+        #     matrix: { app: [ admin, compose, discovery, privacy, reporter, one, workflow ] }
+        #   steps:
+        #     - uses: actions/checkout@v3
+        #     - uses: actions/setup-node@v3
+        #       with: { node-version: "${{ env.NODE_VERSION }}" }
+        #     - name: "Setup YARN"
+        #       working-directory: client/web/${{ matrix.app }}
+        #       run: npm install -g yarn @vue/cli-service
+        #     - name: "Cache"
+        #       uses: actions/cache@v3
+        #       if: ${{ !env.ACT }}
+        #       with:
+        #         path: ~/.npm
+        #         key: ${{ runner.OS }}-node-${{ hashFiles('**/yarn.lock') }}
+        #         restore-keys: ${{ runner.OS }}-node-
+        #     - name: "Dependencies"
+        #       working-directory: client/web/${{ matrix.app }}
+        #       run: make dep
+        #     - name: "Tests"
+        #       working-directory: client/web/${{ matrix.app }}
+        #       run: make test
+        #
+        # server-test:
+        #   name: "Server tests"
+        #   runs-on: ubuntu-20.04
+        #   env:
+        #     GOFLAGS: -mod=readonly
+        #   steps:
+        #     - uses: actions/checkout@v3
+        #     - uses: actions/setup-go@v3
+        #       with: { go-version: "${{ env.GO_VERSION }}" }
+        #     - name: "Copy language files"
+        #       working-directory: server/pkg/locale
+        #       run: make src/en
+        #     - name: "Unit"
+        #       working-directory: server
+        #       run: make test.unit
+        #     - name: "Store"
+        #       working-directory: server
+        #       run: make test.store
+        #     - name: "Integration"
+        #       working-directory: server
+        #       run: make test.integration
+        #
+        # notify:
+        #   if: failure()
+        #   name: "Send matrix testing notification"
+        #   runs-on: ubuntu-20.04
+        #   needs: [ server-test, client-web-test, lib-test ]
+        #   steps:
+        #     - name: "Send message via Matrix on failed tests"
+        #       if: ${{ !env.ACT && failure() }}
+        #       id: matrix-chat-tests-failed
+        #       uses: fadenb/matrix-chat-message@v0.0.6
+        #       with:
+        #         homeserver: ${{ secrets.MATRIX_HOME_SERVER }}
+        #         token: ${{ secrets.MATRIX_ACCESS_TOKEN }}
+        #         channel: ${{ secrets.MATRIX_ROOM_ID }}
